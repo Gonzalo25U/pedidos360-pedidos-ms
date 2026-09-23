@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-
 @Component
 @Profile("local")
 @RequestScope
@@ -27,5 +26,11 @@ public class UsuarioActualHeaderProvider implements UsuarioActualProvider {
     public boolean esAdmin() {
         String rol = request.getHeader("X-User-Role");
         return "Admin".equalsIgnoreCase(rol);
+    }
+
+    @Override
+    public String obtenerEmail() {
+        String header = request.getHeader("X-User-Email");
+        return (header != null && !header.isBlank()) ? header : "usuario-local@ejemplo.com";
     }
 }

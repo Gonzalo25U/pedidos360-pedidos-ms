@@ -23,4 +23,20 @@ public class UsuarioActualJwtProvider implements UsuarioActualProvider {
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(a -> a.equals("ROLE_Admin"));
     }
+
+    @Override
+    public String obtenerEmail() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Azure AD no siempre usa el mismo claim para el email: las cuentas
+        // personales suelen traer "email"; las organizacionales, "preferred_username"
+        // (que normalmente ES su correo/UPN); como ultimo respaldo, "upn".
+        String email = jwt.getClaimAsString("email");
+        if (email == null || email.isBlank()) {
+            email = jwt.getClaimAsString("preferred_username");
+        }
+        if (email == null || email.isBlank()) {
+            email = jwt.getClaimAsString("upn");
+        }
+        return email;
+    }
 }

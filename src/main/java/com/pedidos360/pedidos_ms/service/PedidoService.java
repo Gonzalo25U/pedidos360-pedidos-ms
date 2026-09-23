@@ -2,6 +2,8 @@ package com.pedidos360.pedidos_ms.service;
 
 import com.pedidos360.pedidos_ms.dto.*;
 import com.pedidos360.pedidos_ms.exception.RecursoNoEncontradoException;
+import com.pedidos360.pedidos_ms.mensajeria.PedidoCreadoEvent;
+import com.pedidos360.pedidos_ms.mensajeria.PedidoEventPublisher;
 import com.pedidos360.pedidos_ms.model.DetallePedido;
 import com.pedidos360.pedidos_ms.model.Pedido;
 import com.pedidos360.pedidos_ms.repository.PedidoRepository;
@@ -18,9 +20,10 @@ import java.util.List;
 public class PedidoService {
 
     private final PedidoRepository repository;
+    private final PedidoEventPublisher eventPublisher;
 
     @Transactional
-    public PedidoDTO crear(String usuarioId, CrearPedidoRequest request) {
+    public PedidoDTO crear(String usuarioId, String emailUsuario, CrearPedidoRequest request) {
         Pedido pedido = new Pedido();
         pedido.setUsuarioId(usuarioId);
         pedido.setEstado("PENDIENTE");
@@ -34,7 +37,21 @@ public class PedidoService {
         }
         pedido.setTotal(total);
 
-        return toDTO(repository.save(pedido));
+        PedidoDTO pedidoGuardado = toDTO(repository.save(pedido));
+
+        // El pedido YA quedo guardado en la base de datos en este punto. Publicar
+        // el evento es lo ultimo que se hace, y si falla no revierte el pedido
+        // (ver PedidoEventPublisher) - el checkout no debe depender de que
+        // RabbitMQ este disponible.
+        eventPublisher.publicarPedidoCreado(new PedidoCreadoEvent(
+                pedidoGuardado.getId(),
+                usuarioId,
+                emailUsuario,
+                pedidoGuardado.getTotal(),
+                pedidoGuardado.getItems()
+        ));
+
+        return pedidoGuardado;
     }
 
     /** Lista SOLO los pedidos del usuario indicado (aislamiento por usuario). */

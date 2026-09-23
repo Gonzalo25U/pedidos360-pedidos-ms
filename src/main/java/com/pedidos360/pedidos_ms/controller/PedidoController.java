@@ -1,4 +1,5 @@
 package com.pedidos360.pedidos_ms.controller;
+
 import com.pedidos360.pedidos_ms.dto.CrearPedidoRequest;
 import com.pedidos360.pedidos_ms.dto.PedidoDTO;
 import com.pedidos360.pedidos_ms.exception.AccesoNoPermitidoException;
@@ -22,7 +23,11 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<PedidoDTO> checkout(@Valid @RequestBody CrearPedidoRequest request) {
-        PedidoDTO creado = service.crear(usuarioActualProvider.obtenerUsuarioId(), request);
+        PedidoDTO creado = service.crear(
+                usuarioActualProvider.obtenerUsuarioId(),
+                usuarioActualProvider.obtenerEmail(),
+                request
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
