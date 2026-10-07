@@ -7,3 +7,4 @@ Version 1.5.0: Añadiendo archivo Dockerfile
 Version 1.6.0: integracion con RabbitMQ
 Version 1.6.1: Fix en el Pom para la integracion con RabbitMQ
 Version 2.0.0: Implementando de cognito para el registro e inicio de sesión
+Version 2.0.1: Fix en el envio de la notificacion del pedido
