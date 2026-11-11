@@ -26,6 +26,13 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:pedidos360}
     password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        # Un mensaje que falla no se reencola en bucle infinito
+        default-requeue-rejected: false
+        retry:
+          enabled: true
+          max-retries: 2
 
 cors:
   allowed-origins: ${FRONTEND_URL:http://localhost:4200}
