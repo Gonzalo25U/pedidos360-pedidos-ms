@@ -28,6 +28,10 @@ public class Pedido {
     @Column(nullable = false)
     private BigDecimal total;
 
+    /** Orden de compra de Webpay. UNIQUE: garantiza un solo pedido por pago aprobado. */
+    @Column(name = "buy_order", length = 26, unique = true)
+    private String buyOrder;
+
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
